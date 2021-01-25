@@ -1,4 +1,4 @@
-# Bakaláři cliet
+# Bakaláři client
 Client for Bakaláři app (alpha)
 - features:
   - currently only dynamic schedule displaying
