@@ -25,41 +25,40 @@ namespace BakalariClient
     public partial class MainWindow : Window
     {
         private CookieContainer cookieContainer;
+        private Config config;
         public MainWindow()
         {
             InitializeComponent();
             Init();
         }
 
-        /// <summary>
-        /// Log in user based on credentials and store cookies
-        /// </summary>
-        /// <param name="loginService"> Instance of  LoginService</param>
-        /// <returns> void </returns>
-        private void AuthorizeUser(LoginService loginService)
-        {
-            string filename = "credentials.json";
-#if DEBUG
-            filename = @"..\..\" + filename;
-#endif
-            CredentialReaderService jsonReaderService = new CredentialReaderService(filename);
-            Credential credentials = jsonReaderService.GetCredentialsFromFile();
-            cookieContainer = loginService.Authorize(credentials);
-        }
-
         private void Init()
         {
             // Login user and set cookies
-            LoginService loginService = new LoginService(ConfigurationManager.AppSettings["loginUrl"]);
-            AuthorizeUser(loginService);
+            string filename = "config.json";
+#if DEBUG
+            filename = @"..\..\" + filename;
+#endif
+            GetCredentials(filename);
+
+            LoginService loginService = new LoginService(config.LoginUrl);
+            cookieContainer = loginService.Authorize(config.Credential);
+
 
             // Get Schedule (rozvrh)
-            ScheduleService scheduleService = new ScheduleService(cookieContainer, ConfigurationManager.AppSettings["scheduleUrl"]);
+            ScheduleService scheduleService = new ScheduleService(cookieContainer, config.ScheduleUrl);
             scheduleService.GetHtmlPage();
             Schedule schedule = scheduleService.GetSchedule();
 
-            ScheduleGeneratorService scheduleGenerator = new ScheduleGeneratorService(schedule);
-            scheduleGenerator.GenerateSchedule(ScheduleGrid);
+            ScheduleGeneratorService scheduleGenerator = new ScheduleGeneratorService(schedule, leftHeadSize: 1, topHeadSize: 1);
+            scheduleGenerator.GenerateSchedule(ScheduleContentGrid);
+        }
+
+        private Config GetCredentials(string filename)
+        {
+            CredentialReaderService jsonReaderService = new CredentialReaderService(filename);
+            config = jsonReaderService.GetConfig();
+            return config;
         }
     }
 }

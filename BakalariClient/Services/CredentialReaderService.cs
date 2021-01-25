@@ -21,9 +21,9 @@ namespace BakalariClient.Services
         /// Read file and return contents
         /// </summary>
         /// <returns></returns>
-        public Credential GetCredentialsFromFile()
+        public Config GetConfig()
         {
-            return JsonConvert.DeserializeObject<Credential>(File.ReadAllText(filename));
+            return JsonConvert.DeserializeObject<Config>(File.ReadAllText(filename));
         }
     }
 }

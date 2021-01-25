@@ -9,17 +9,22 @@ using System.Windows.Media;
 using BakalariClient.Models;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
-using Color = System.Drawing.Color;
 
 namespace BakalariClient.Services
 {
     class ScheduleGeneratorService
     {
         public readonly Schedule schedule;
+        private readonly int leftHeadSize;
+        private readonly int topHeadSize;
 
-        public ScheduleGeneratorService(Schedule schedule)
+        public ScheduleGeneratorService(Schedule schedule, int leftHeadSize = 0, int topHeadSize = 0)
         {
             this.schedule = schedule;
+            this.leftHeadSize = leftHeadSize;
+            this.topHeadSize = topHeadSize;
+
+            
         }
 
         /// <summary>
@@ -34,6 +39,38 @@ namespace BakalariClient.Services
                 grid.ColumnDefinitions.Add(new ColumnDefinition()
                 {
                     Width = new GridLength(1, GridUnitType.Star),
+                });
+            }
+        }
+
+        /// <summary>
+        /// Create column sizes
+        /// </summary>
+        /// <param name="grid"> Grid where column definitions are created </param>
+        /// <param name="count"> Number of columns </param>
+        public void GenerateColumnDefinitions(Grid grid, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition()
+                {
+                    Width = new GridLength(1, GridUnitType.Star),
+                });
+            }
+        }
+
+        /// <summary>
+        /// Create row sizes
+        /// </summary>
+        /// <param name="grid"> Grid where row definitions are created </param>
+        /// /// <param name="count"> Number of rows </param>
+        public void GenerateRowDefinitions(Grid grid, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                grid.RowDefinitions.Add(new RowDefinition()
+                {
+                    Height = new GridLength(1, GridUnitType.Star),
                 });
             }
         }
@@ -54,12 +91,14 @@ namespace BakalariClient.Services
                 Text = scheduleSubject.ShortName,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
+                TextWrapping = TextWrapping.Wrap,
             };
 
             Card card = new Card()
             {
                 Content = textBlock,
                 Margin = new Thickness(2),
+                UniformCornerRadius = 3,
             };
 
             return card;
@@ -74,6 +113,8 @@ namespace BakalariClient.Services
         {
             // Generate definition
             this.GenerateColumnDefinitions(grid);
+            this.GenerateColumnDefinitions(grid, leftHeadSize);
+            this.GenerateRowDefinitions(grid, topHeadSize);
 
             int dayNumber = 0;
             foreach (ScheduleDay scheduleDay in schedule.ScheduleDays)
@@ -82,8 +123,8 @@ namespace BakalariClient.Services
                 foreach (ScheduleSubject scheduleSubject in scheduleDay.ScheduleSubjects)
                 {
                     UIElement uiElement = this.GenerateCell(scheduleSubject);
-                    Grid.SetRow(uiElement, dayNumber);
-                    Grid.SetColumn(uiElement, subjectNumber);
+                    Grid.SetRow(uiElement, dayNumber + topHeadSize);
+                    Grid.SetColumn(uiElement, subjectNumber + leftHeadSize);
                     grid.Children.Add(uiElement);
                     subjectNumber++;
                 }
@@ -92,5 +133,7 @@ namespace BakalariClient.Services
 
             return grid;
         }
+
+
     }
 }

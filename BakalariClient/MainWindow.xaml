@@ -23,7 +23,7 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <StackPanel x:Name="Navbar" Grid.Column="0" Grid.Row="0"/>
-        <Grid x:Name="ScheduleGrid" Grid.Column="1">
+        <Grid x:Name="ScheduleContentGrid" Grid.Column="1" Margin="20,50,20,20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
