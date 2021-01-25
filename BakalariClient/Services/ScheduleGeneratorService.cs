@@ -15,28 +15,114 @@ namespace BakalariClient.Services
     class ScheduleGeneratorService
     {
         public readonly Schedule schedule;
-        private readonly int leftHeadSize;
-        private readonly int topHeadSize;
+        private int leftHeadSize;
+        private int topHeadSize;
+        private Grid Grid;
 
-        public ScheduleGeneratorService(Schedule schedule, int leftHeadSize = 0, int topHeadSize = 0)
+        public ScheduleGeneratorService(Schedule schedule, Grid grid, int leftHeadSize = 0, int topHeadSize = 0, bool dayLabel = true, bool timeLabel = true)
         {
             this.schedule = schedule;
             this.leftHeadSize = leftHeadSize;
             this.topHeadSize = topHeadSize;
+            Grid = grid;
 
-            
+
+            if (dayLabel)
+            {
+                this.leftHeadSize += 1;
+            }
+            if (timeLabel)
+            {
+                this.topHeadSize += 1;
+            }
+
+            // Generate definition
+            this.GenerateColumnDefinitions();
+            this.GenerateColumnDefinitions(this.leftHeadSize);
+            this.GenerateRowDefinitions(5 + this.topHeadSize);
+
+            if (dayLabel)
+            {
+                GenerateDayLabel();
+            }
+
+            if (timeLabel)
+            {
+                GenerateTimeLabel();
+            }
         }
+
+        /// <summary>
+        /// Generate time labels (0. lesson, 1., 2., etc.)
+        /// </summary>
+        public void GenerateTimeLabel()
+        {
+            for (int i = 0; i < schedule.ScheduleDays[0].ScheduleSubjects.Count; i++)
+            {
+                TextBlock textBlock = new TextBlock
+                {
+                    Text = i.ToString(),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextWrapping = TextWrapping.Wrap,
+                };
+
+                Card card = new Card()
+                {
+                    Content = textBlock,
+                    Margin = new Thickness(2),
+                    UniformCornerRadius = 3,
+                    Opacity = 0.5,
+                    Height = 30,
+                };
+                Grid.SetRow(card, topHeadSize - 1);
+                Grid.SetColumn(card, i + leftHeadSize);
+
+                Grid.Children.Add(card);
+            }
+        }
+
+        /// <summary>
+        /// Generate day labels (Mo, Tu, etc.)
+        /// </summary>
+        public void GenerateDayLabel()
+        {
+            int i = 0;
+            foreach (string dayLabel in ScheduleParserService.dayLabels)
+            {
+                TextBlock textBlock = new TextBlock
+                {
+                    Text = dayLabel.Substring(0,2),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextWrapping = TextWrapping.Wrap,
+                };
+
+                Card card = new Card()
+                {
+                    Content = textBlock,
+                    Margin = new Thickness(2),
+                    UniformCornerRadius = 3,
+                    Opacity = 0.5,
+                };
+                Grid.SetRow(card, i + topHeadSize);
+                Grid.SetColumn(card, leftHeadSize - 1);
+
+                i++;
+                Grid.Children.Add(card);
+            }
+        }
+        
 
         /// <summary>
         /// Create column sizes
         /// </summary>
-        /// <param name="grid"> Grid where column definitions are created </param>
-        public void GenerateColumnDefinitions(Grid grid)
+        public void GenerateColumnDefinitions()
         {
             int maxLessons = schedule.ScheduleDays[0].ScheduleSubjects.Count;
             for (int i = 0; i < maxLessons; i++)
             {
-                grid.ColumnDefinitions.Add(new ColumnDefinition()
+                Grid.ColumnDefinitions.Add(new ColumnDefinition()
                 {
                     Width = new GridLength(1, GridUnitType.Star),
                 });
@@ -46,13 +132,12 @@ namespace BakalariClient.Services
         /// <summary>
         /// Create column sizes
         /// </summary>
-        /// <param name="grid"> Grid where column definitions are created </param>
         /// <param name="count"> Number of columns </param>
-        public void GenerateColumnDefinitions(Grid grid, int count)
+        public void GenerateColumnDefinitions(int count)
         {
             for (int i = 0; i < count; i++)
             {
-                grid.ColumnDefinitions.Add(new ColumnDefinition()
+                Grid.ColumnDefinitions.Add(new ColumnDefinition()
                 {
                     Width = new GridLength(1, GridUnitType.Star),
                 });
@@ -62,13 +147,12 @@ namespace BakalariClient.Services
         /// <summary>
         /// Create row sizes
         /// </summary>
-        /// <param name="grid"> Grid where row definitions are created </param>
         /// /// <param name="count"> Number of rows </param>
-        public void GenerateRowDefinitions(Grid grid, int count)
+        public void GenerateRowDefinitions(int count)
         {
             for (int i = 0; i < count; i++)
             {
-                grid.RowDefinitions.Add(new RowDefinition()
+                Grid.RowDefinitions.Add(new RowDefinition()
                 {
                     Height = new GridLength(1, GridUnitType.Star),
                 });
@@ -105,17 +189,11 @@ namespace BakalariClient.Services
         }
 
         /// <summary>
-        /// Generate grid subjects
+        /// Generate Grid subjects
         /// </summary>
-        /// <param name="grid"> Grid in which subjects are generated </param>
         /// <returns></returns>
-        public Grid GenerateSchedule(Grid grid)
+        public Grid GenerateSchedule()
         {
-            // Generate definition
-            this.GenerateColumnDefinitions(grid);
-            this.GenerateColumnDefinitions(grid, leftHeadSize);
-            this.GenerateRowDefinitions(grid, topHeadSize);
-
             int dayNumber = 0;
             foreach (ScheduleDay scheduleDay in schedule.ScheduleDays)
             {
@@ -125,13 +203,13 @@ namespace BakalariClient.Services
                     UIElement uiElement = this.GenerateCell(scheduleSubject);
                     Grid.SetRow(uiElement, dayNumber + topHeadSize);
                     Grid.SetColumn(uiElement, subjectNumber + leftHeadSize);
-                    grid.Children.Add(uiElement);
+                    Grid.Children.Add(uiElement);
                     subjectNumber++;
                 }
                 dayNumber++;
             }
 
-            return grid;
+            return Grid;
         }
 
 

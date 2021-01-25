@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace BakalariClient.Models
 {
-    class Schedule
+    class ScheduleTimes
     {
-        public List<ScheduleDay> ScheduleDays { get; set; }
+        
+        public string Begin { get; set; }
+        public string End { get; set; }
+
     }
 }

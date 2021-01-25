@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -16,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using BakalariClient.Models;
 using BakalariClient.Services;
+using Newtonsoft.Json;
 
 namespace BakalariClient
 {
@@ -36,9 +38,8 @@ namespace BakalariClient
         {
             // Login user and set cookies
             string filename = "config.json";
-#if DEBUG
             filename = @"..\..\" + filename;
-#endif
+
             GetCredentials(filename);
 
             LoginService loginService = new LoginService(config.LoginUrl);
@@ -50,8 +51,8 @@ namespace BakalariClient
             scheduleService.GetHtmlPage();
             Schedule schedule = scheduleService.GetSchedule();
 
-            ScheduleGeneratorService scheduleGenerator = new ScheduleGeneratorService(schedule, leftHeadSize: 1, topHeadSize: 1);
-            scheduleGenerator.GenerateSchedule(ScheduleContentGrid);
+            ScheduleGeneratorService scheduleGenerator = new ScheduleGeneratorService(schedule, ScheduleContentGrid);
+            scheduleGenerator.GenerateSchedule();
         }
 
         private Config GetCredentials(string filename)

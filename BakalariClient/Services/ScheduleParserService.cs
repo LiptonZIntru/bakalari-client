@@ -17,7 +17,7 @@ namespace BakalariClient.Services
         private readonly string rawHtml;
         public Schedule Schedule;
 
-        private static readonly string[] dayLabels = new string[5]
+        public static readonly string[] dayLabels = new string[5]
         {
             "Pondělí",
             "Úterý",

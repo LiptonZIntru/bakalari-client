@@ -121,6 +121,7 @@
     <Compile Include="Models\Schedule.cs" />
     <Compile Include="Models\ScheduleDay.cs" />
     <Compile Include="Models\ScheduleSubject.cs" />
+    <Compile Include="Models\ScheduleTimes.cs" />
     <Compile Include="Services\HttpRequestService.cs" />
     <Compile Include="Services\CredentialReaderService.cs" />
     <Compile Include="Services\LoginService.cs" />
