@@ -38,7 +38,11 @@ namespace BakalariClient
         /// <returns> void </returns>
         private void AuthorizeUser(LoginService loginService)
         {
-            CredentialReaderService jsonReaderService = new CredentialReaderService("credentials.json");
+            string filename = "credentials.json";
+#if DEBUG
+            filename = @"..\..\" + filename;
+#endif
+            CredentialReaderService jsonReaderService = new CredentialReaderService(filename);
             Credential credentials = jsonReaderService.GetCredentialsFromFile();
             cookieContainer = loginService.Authorize(credentials);
         }

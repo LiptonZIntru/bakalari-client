@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BakalariClient.Models;
+using ScheduleClassLibrary.Models;
 using Newtonsoft.Json;
 
-namespace BakalariClient.Services
+namespace ScheduleClassLibrary.Services
 {
     class CredentialReaderService
     {
@@ -23,7 +23,7 @@ namespace BakalariClient.Services
         /// <returns></returns>
         public Credential GetCredentialsFromFile()
         {
-            return JsonConvert.DeserializeObject<Credential>(File.ReadAllText(filename));
+            return JsonConvert.DeserializeObject<Credential>(File.ReadAllText(@"..\..\" + filename));
         }
     }
 }

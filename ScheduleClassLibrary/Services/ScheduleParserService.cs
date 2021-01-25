@@ -6,11 +6,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using BakalariClient.Models;
+using ScheduleClassLibrary.Models;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 
-namespace BakalariClient.Services
+namespace ScheduleClassLibrary.Services
 {
     class ScheduleParserService
     {
@@ -117,6 +117,7 @@ namespace BakalariClient.Services
 
             try
             {
+                var a = dataDiv.GetClasses();
                 if (dataDiv.GetClasses().FirstOrDefault() == null)
                 {
                     return null;
@@ -125,10 +126,11 @@ namespace BakalariClient.Services
                 {
                     return null;
                 }
+
+                var b = a;
             }
             catch (Exception e)
             {
-                MessageBox.Show("NEZNÁMÝ PŘEDMĚT \n\n" + e.ToString());
                 throw new Exception("Subject cannot be parsed");
             }
 

@@ -5,13 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using BakalariClient.Models;
-using MaterialDesignColors;
-using MaterialDesignThemes.Wpf;
-using Color = System.Drawing.Color;
+using ScheduleClassLibrary.Models;
 
-namespace BakalariClient.Services
+namespace ScheduleClassLibrary.Services
 {
     class ScheduleGeneratorService
     {
@@ -45,24 +41,18 @@ namespace BakalariClient.Services
         /// <returns></returns>
         public UIElement GenerateCell(ScheduleSubject scheduleSubject)
         {
-            if (scheduleSubject == null)
+            Grid grid = new Grid()
             {
-                return new TextBlock();
-            }
-            TextBlock textBlock = new TextBlock
-            {
-                Text = scheduleSubject.ShortName,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-
-            Card card = new Card()
+            TextBlock textBlock = new TextBlock
             {
-                Content = textBlock,
-                Margin = new Thickness(2),
+                Text = scheduleSubject == null ? "" : scheduleSubject.ShortName
             };
 
-            return card;
+            grid.Children.Add(textBlock);
+            return grid;
         }
 
         /// <summary>
