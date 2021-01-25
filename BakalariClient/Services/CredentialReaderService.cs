@@ -9,10 +9,10 @@ using Newtonsoft.Json;
 
 namespace BakalariClient.Services
 {
-    class JsonReaderService
+    class CredentialReaderService
     {
         private readonly string filename;
-        public JsonReaderService(string filename)
+        public CredentialReaderService(string filename)
         {
             this.filename = filename;
         }
@@ -21,7 +21,7 @@ namespace BakalariClient.Services
         /// Read file and return contents
         /// </summary>
         /// <returns></returns>
-        public Credential GetCredentials()
+        public Credential GetCredentialsFromFile()
         {
             return JsonConvert.DeserializeObject<Credential>(File.ReadAllText(@"..\..\" + filename));
         }

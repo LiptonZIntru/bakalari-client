@@ -15,10 +15,10 @@ namespace BakalariClient.Services
     {
         public CookieContainer cookieContainer;
         private readonly string url;
-        public LoginService()
+        public LoginService(string url)
         {
             cookieContainer = new CookieContainer();
-            url = ConfigurationManager.AppSettings["loginUrl"];
+            this.url = url;
         }
 
         /// <summary>
@@ -27,14 +27,14 @@ namespace BakalariClient.Services
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns> Login cookies </returns>
-        public async Task<CookieContainer> Authorize(string username, string password)
+        public CookieContainer Authorize(string username, string password)
         {
             Credential credentials = new Credential()
             {
                 Username = username,
                 Password = password
             };
-            return await Authorize(credentials);
+            return Authorize(credentials);
         }
 
         /// <summary>
@@ -42,11 +42,10 @@ namespace BakalariClient.Services
         /// </summary>
         /// <param name="credentials"></param>
         /// <returns> Login cookies </returns>
-        public async Task<CookieContainer> Authorize(Credential credentials)
+        public CookieContainer Authorize(Credential credentials)
         {
             HttpRequestService httpRequestService = new HttpRequestService();
-            await httpRequestService.Send(url, cookieContainer, credentials);
-
+            httpRequestService.Send(url, cookieContainer, credentials, false);
             return cookieContainer;
         }
     }

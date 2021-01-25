@@ -25,31 +25,37 @@ namespace BakalariClient
     public partial class MainWindow : Window
     {
         private CookieContainer cookieContainer;
-        private readonly string url;
         public MainWindow()
         {
             InitializeComponent();
-
-            url = ConfigurationManager.AppSettings["url"];
-
-
-            LoginService loginService = new LoginService();
-            Task.Run(async () =>  await AuthorizeUser(loginService)).Wait();
-
-            ScheduleService scheduleService = new ScheduleService(cookieContainer);
-            Task.Run(async () => await scheduleService.GetSchedule()).Wait();
+            Init();
         }
 
         /// <summary>
-        /// Wrapper method for log in user based on credentials amd store cookies
+        /// Log in user based on credentials and store cookies
         /// </summary>
         /// <param name="loginService"> Instance of  LoginService</param>
         /// <returns> void </returns>
-        private async Task AuthorizeUser(LoginService loginService)
+        private void AuthorizeUser(LoginService loginService)
         {
-            JsonReaderService jsonReaderService = new JsonReaderService("credentials.json");
-            Credential credentials = jsonReaderService.GetCredentials();
-            cookieContainer = await loginService.Authorize(credentials);
+            CredentialReaderService jsonReaderService = new CredentialReaderService("credentials.json");
+            Credential credentials = jsonReaderService.GetCredentialsFromFile();
+            cookieContainer = loginService.Authorize(credentials);
+        }
+
+        private void Init()
+        {
+            // Login user and set cookies
+            LoginService loginService = new LoginService(ConfigurationManager.AppSettings["loginUrl"]);
+            AuthorizeUser(loginService);
+
+            // Get Schedule (rozvrh)
+            ScheduleService scheduleService = new ScheduleService(cookieContainer, ConfigurationManager.AppSettings["scheduleUrl"]);
+            scheduleService.GetHtmlPage();
+            Schedule schedule = scheduleService.GetSchedule();
+
+            ScheduleGeneratorService scheduleGenerator = new ScheduleGeneratorService(schedule);
+            scheduleGenerator.GenerateSchedule(ScheduleGrid);
         }
     }
 }
