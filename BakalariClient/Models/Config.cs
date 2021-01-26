@@ -29,7 +29,7 @@ namespace BakalariClient.Models
         }
 
         [JsonIgnore]
-        public string _Domain { get; set; }
+        private string _Domain { get; set; }
 
         [JsonIgnore]
         public string LoginUrl

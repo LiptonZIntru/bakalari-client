@@ -38,12 +38,13 @@ namespace BakalariClient.Services
             return rawHtml;
         }
 
-        // TODO: add comment
+        /// <summary>
+        /// Generate Schedule and return result
+        /// </summary>
+        /// <returns></returns>
         public Schedule GetSchedule()
         {
             ScheduleParserService scheduleParserService = new ScheduleParserService(rawHtml);
-
-            // TODO: add header of schedule
 
             Schedule = scheduleParserService.ParseSchedule();
             return Schedule;

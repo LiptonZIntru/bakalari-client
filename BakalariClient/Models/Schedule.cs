@@ -9,5 +9,7 @@ namespace BakalariClient.Models
     class Schedule
     {
         public List<ScheduleDay> ScheduleDays { get; set; }
+
+        public List<ScheduleTime> ScheduleTimes { get; set; }
     }
 }

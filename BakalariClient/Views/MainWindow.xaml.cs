@@ -17,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using BakalariClient.Models;
 using BakalariClient.Services;
+using BakalariClient.Views;
 using Newtonsoft.Json;
 
 namespace BakalariClient
@@ -31,16 +32,26 @@ namespace BakalariClient
         public MainWindow()
         {
             InitializeComponent();
-            Init();
-        }
 
-        private void Init()
+            try
+            {
+                CredentialService credentialService = new CredentialService();
+                config = credentialService.GetCredentials();
+            }
+            catch (Exception e)
+            {
+                CredentialWindow credentialWindow = new CredentialWindow();
+                credentialWindow.ShowDialog();
+            }
+            LoadSchedule();
+        }
+        
+
+        private void LoadSchedule()
         {
             // Login user and set cookies
-            string filename = "config.json";
-            filename = @"..\..\" + filename;
-
-            GetCredentials(filename);
+            CredentialService credentialService = new CredentialService();
+            config = credentialService.GetCredentials();
 
             LoginService loginService = new LoginService(config.LoginUrl);
             cookieContainer = loginService.Authorize(config.Credential);
@@ -53,13 +64,6 @@ namespace BakalariClient
 
             ScheduleGeneratorService scheduleGenerator = new ScheduleGeneratorService(schedule, ScheduleContentGrid);
             scheduleGenerator.GenerateSchedule();
-        }
-
-        private Config GetCredentials(string filename)
-        {
-            CredentialReaderService jsonReaderService = new CredentialReaderService(filename);
-            config = jsonReaderService.GetConfig();
-            return config;
         }
     }
 }

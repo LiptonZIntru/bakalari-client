@@ -5,6 +5,12 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BakalariClient", "BakalariClient\BakalariClient.csproj", "{810F02B9-DC87-474F-8C3F-F02A3E445E92}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Views", "Views", "{8C5ECA0A-56A6-48A8-A863-77B3CA40A94F}"
+	ProjectSection(SolutionItems) = preProject
+		BakalariClient\MainWindow.xaml = BakalariClient\MainWindow.xaml
+		BakalariClient\MainWindow.xaml.cs = BakalariClient\MainWindow.xaml.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

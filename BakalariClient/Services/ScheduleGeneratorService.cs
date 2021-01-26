@@ -9,6 +9,7 @@ using System.Windows.Media;
 using BakalariClient.Models;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
+using System.Windows.Media;
 
 namespace BakalariClient.Services
 {
@@ -43,28 +44,31 @@ namespace BakalariClient.Services
 
             if (dayLabel)
             {
-                GenerateDayLabel();
+                GenerateDayLabels();
             }
 
             if (timeLabel)
             {
-                GenerateTimeLabel();
+                GenerateTimeLabels();
             }
         }
 
         /// <summary>
         /// Generate time labels (0. lesson, 1., 2., etc.)
         /// </summary>
-        public void GenerateTimeLabel()
+        public void GenerateTimeLabels()
         {
-            for (int i = 0; i < schedule.ScheduleDays[0].ScheduleSubjects.Count; i++)
+            int i = 0;
+            foreach (ScheduleTime scheduleTime in schedule.ScheduleTimes)
             {
                 TextBlock textBlock = new TextBlock
                 {
-                    Text = i.ToString(),
+                    Text = $"{ scheduleTime.Num }\n{ scheduleTime.Begin } - { scheduleTime.End }",
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
                     TextWrapping = TextWrapping.Wrap,
+                    FontSize = 10,
+                    TextAlignment = TextAlignment.Center,
                 };
 
                 Card card = new Card()
@@ -79,23 +83,26 @@ namespace BakalariClient.Services
                 Grid.SetColumn(card, i + leftHeadSize);
 
                 Grid.Children.Add(card);
+                i++;
             }
         }
 
         /// <summary>
         /// Generate day labels (Mo, Tu, etc.)
         /// </summary>
-        public void GenerateDayLabel()
+        public void GenerateDayLabels()
         {
             int i = 0;
-            foreach (string dayLabel in ScheduleParserService.dayLabels)
+            foreach (ScheduleDay scheduleDay in schedule.ScheduleDays)
             {
                 TextBlock textBlock = new TextBlock
                 {
-                    Text = dayLabel.Substring(0,2),
+                    Text = $"{ scheduleDay.DayNameShort }\n{ scheduleDay.DateShort }",
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
                     TextWrapping = TextWrapping.Wrap,
+                    TextAlignment = TextAlignment.Center,
+                    FontSize = 12,
                 };
 
                 Card card = new Card()
@@ -176,6 +183,7 @@ namespace BakalariClient.Services
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap,
+                ToolTip = GenerateTooltip(scheduleSubject),
             };
 
             Card card = new Card()
@@ -212,6 +220,29 @@ namespace BakalariClient.Services
             return Grid;
         }
 
-
+        public UIElement GenerateTooltip(ScheduleSubject scheduleSubject)
+        {
+            string tooltipContent = (scheduleSubject.Teacher != "" ?       $"Učitel: {scheduleSubject.Teacher}\n" : "") +
+                                    (scheduleSubject.ClassLocation != "" ? $"Učebna: {scheduleSubject.ClassLocation}\n" : "") +
+                                    (scheduleSubject.Group != "" ?         $"Skupina: {scheduleSubject.Group}\n" : "") +
+                                    (scheduleSubject.LessonSubject != "" ? $"Téma: {scheduleSubject.LessonSubject}\n" : "") +
+                                    (scheduleSubject.ChangeInfo != "" ?    $"Změny: {scheduleSubject.ChangeInfo}\n" : "") +
+                                    (scheduleSubject.Notice != "" ?        $"Upozornění: {scheduleSubject.Notice}\n" : "");
+            TextBlock textBlock = new TextBlock()
+            {
+                Text = tooltipContent.Trim(),
+                Foreground = new SolidColorBrush()
+                {
+                    Color = Color.FromRgb(255, 255, 247),
+                }
+                
+            };
+            Card card = new Card()
+            {
+                Content = textBlock,
+                Padding = new Thickness(3),
+            };
+            return card;
+        }
     }
 }
