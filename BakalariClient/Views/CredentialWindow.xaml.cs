@@ -23,9 +23,12 @@ namespace BakalariClient.Views
     /// </summary>
     public partial class CredentialWindow : Window
     {
+        private LogService logService;
         public CredentialWindow()
         {
             InitializeComponent();
+
+            logService = new LogService();
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
@@ -42,6 +45,9 @@ namespace BakalariClient.Views
 
             CredentialService credentialService = new CredentialService();
             credentialService.SetCredentials(config);
+
+            logService.Add("Credentials file created");
+
             this.Close();
         }
     }
