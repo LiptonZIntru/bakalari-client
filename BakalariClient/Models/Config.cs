@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace BakalariClient.Models
         }
 
         [JsonIgnore]
-        public string _Domain { get; set; }
+        private string _Domain { get; set; }
 
         [JsonIgnore]
         public string LoginUrl

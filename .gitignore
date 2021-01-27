@@ -1,5 +1,8 @@
 .vs
 */bin
 */obj
-BakalariClient/credentials.json
 packages
+jsons
+config.json
+releases
+BakalariClient/config.json

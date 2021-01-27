@@ -17,7 +17,7 @@ namespace BakalariClient.Services
         private readonly string rawHtml;
         public Schedule Schedule;
 
-        private static readonly string[] dayLabels = new string[5]
+        public static readonly string[] dayLabels = new string[5]
         {
             "Pondělí",
             "Úterý",
@@ -42,9 +42,38 @@ namespace BakalariClient.Services
 
             Schedule = new Schedule()
             {
+                ScheduleTimes = ParseScheduleTimes(htmlDoc),
                 ScheduleDays = LoadDays(htmlDoc),
             };
             return Schedule;
+        }
+
+        /// <summary>
+        /// Load schedule times
+        /// </summary>
+        /// <param name="html"> HTML document </param>
+        /// <returns></returns>
+        public List<ScheduleTime> ParseScheduleTimes(HtmlDocument html)
+        {
+            List<ScheduleTime> scheduleTimes = new List<ScheduleTime>();
+
+            HtmlNode htmlTimesNode = html.DocumentNode.SelectNodes("//*[@id='hours']").First();
+
+            List<HtmlNode> times = htmlTimesNode.ChildNodes.Where(x => x.HasClass("item")).ToList();
+
+            foreach (HtmlNode time in times)
+            {
+                HtmlNode hour = time.ChildNodes.Single(x => x.HasClass("hour"));
+                scheduleTimes.Add(new ScheduleTime()
+                {
+                    Begin = hour.ChildNodes.Single(x => x.HasClass("from")).InnerText.Trim(),
+                    End = hour.ChildNodes.Single(x => x.HasClass("to")).InnerText.Trim(),
+                    Num = int.Parse(time.ChildNodes.Single(x => x.HasClass("num")).InnerText)
+                });
+                
+            }
+
+            return scheduleTimes;
         }
 
         /// <summary>

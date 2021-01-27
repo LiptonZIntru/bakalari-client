@@ -9,34 +9,127 @@ using System.Windows.Media;
 using BakalariClient.Models;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
+using System.Windows.Media;
 
 namespace BakalariClient.Services
 {
     class ScheduleGeneratorService
     {
         public readonly Schedule schedule;
-        private readonly int leftHeadSize;
-        private readonly int topHeadSize;
+        private int leftHeadSize;
+        private int topHeadSize;
+        private Grid Grid;
 
-        public ScheduleGeneratorService(Schedule schedule, int leftHeadSize = 0, int topHeadSize = 0)
+        public ScheduleGeneratorService(Schedule schedule, Grid grid, int leftHeadSize = 0, int topHeadSize = 0, bool dayLabel = true, bool timeLabel = true)
         {
             this.schedule = schedule;
             this.leftHeadSize = leftHeadSize;
             this.topHeadSize = topHeadSize;
+            Grid = grid;
 
-            
+
+            if (dayLabel)
+            {
+                this.leftHeadSize += 1;
+            }
+            if (timeLabel)
+            {
+                this.topHeadSize += 1;
+            }
+
+            // Generate definition
+            this.GenerateColumnDefinitions();
+            this.GenerateColumnDefinitions(this.leftHeadSize);
+            this.GenerateRowDefinitions(5 + this.topHeadSize);
+
+            if (dayLabel)
+            {
+                GenerateDayLabels();
+            }
+
+            if (timeLabel)
+            {
+                GenerateTimeLabels();
+            }
         }
+
+        /// <summary>
+        /// Generate time labels (0. lesson, 1., 2., etc.)
+        /// </summary>
+        public void GenerateTimeLabels()
+        {
+            int i = 0;
+            foreach (ScheduleTime scheduleTime in schedule.ScheduleTimes)
+            {
+                TextBlock textBlock = new TextBlock
+                {
+                    Text = $"{ scheduleTime.Num }\n{ scheduleTime.Begin } - { scheduleTime.End }",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextWrapping = TextWrapping.Wrap,
+                    FontSize = 10,
+                    TextAlignment = TextAlignment.Center,
+                };
+
+                Card card = new Card()
+                {
+                    Content = textBlock,
+                    Margin = new Thickness(2),
+                    UniformCornerRadius = 3,
+                    Opacity = 0.5,
+                    Height = 30,
+                };
+                Grid.SetRow(card, topHeadSize - 1);
+                Grid.SetColumn(card, i + leftHeadSize);
+
+                Grid.Children.Add(card);
+                i++;
+            }
+        }
+
+        /// <summary>
+        /// Generate day labels (Mo, Tu, etc.)
+        /// </summary>
+        public void GenerateDayLabels()
+        {
+            int i = 0;
+            foreach (ScheduleDay scheduleDay in schedule.ScheduleDays)
+            {
+                TextBlock textBlock = new TextBlock
+                {
+                    Text = $"{ scheduleDay.DayNameShort }\n{ scheduleDay.DateShort }",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextWrapping = TextWrapping.Wrap,
+                    TextAlignment = TextAlignment.Center,
+                    FontSize = 12,
+                };
+
+                Card card = new Card()
+                {
+                    Content = textBlock,
+                    Margin = new Thickness(2),
+                    UniformCornerRadius = 3,
+                    Opacity = 0.5,
+                };
+                Grid.SetRow(card, i + topHeadSize);
+                Grid.SetColumn(card, leftHeadSize - 1);
+
+                i++;
+                Grid.Children.Add(card);
+            }
+        }
+        
 
         /// <summary>
         /// Create column sizes
         /// </summary>
-        /// <param name="grid"> Grid where column definitions are created </param>
-        public void GenerateColumnDefinitions(Grid grid)
+        public void GenerateColumnDefinitions()
         {
             int maxLessons = schedule.ScheduleDays[0].ScheduleSubjects.Count;
             for (int i = 0; i < maxLessons; i++)
             {
-                grid.ColumnDefinitions.Add(new ColumnDefinition()
+                Grid.ColumnDefinitions.Add(new ColumnDefinition()
                 {
                     Width = new GridLength(1, GridUnitType.Star),
                 });
@@ -46,13 +139,12 @@ namespace BakalariClient.Services
         /// <summary>
         /// Create column sizes
         /// </summary>
-        /// <param name="grid"> Grid where column definitions are created </param>
         /// <param name="count"> Number of columns </param>
-        public void GenerateColumnDefinitions(Grid grid, int count)
+        public void GenerateColumnDefinitions(int count)
         {
             for (int i = 0; i < count; i++)
             {
-                grid.ColumnDefinitions.Add(new ColumnDefinition()
+                Grid.ColumnDefinitions.Add(new ColumnDefinition()
                 {
                     Width = new GridLength(1, GridUnitType.Star),
                 });
@@ -62,13 +154,12 @@ namespace BakalariClient.Services
         /// <summary>
         /// Create row sizes
         /// </summary>
-        /// <param name="grid"> Grid where row definitions are created </param>
         /// /// <param name="count"> Number of rows </param>
-        public void GenerateRowDefinitions(Grid grid, int count)
+        public void GenerateRowDefinitions(int count)
         {
             for (int i = 0; i < count; i++)
             {
-                grid.RowDefinitions.Add(new RowDefinition()
+                Grid.RowDefinitions.Add(new RowDefinition()
                 {
                     Height = new GridLength(1, GridUnitType.Star),
                 });
@@ -92,6 +183,7 @@ namespace BakalariClient.Services
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap,
+                ToolTip = GenerateTooltip(scheduleSubject),
             };
 
             Card card = new Card()
@@ -105,17 +197,11 @@ namespace BakalariClient.Services
         }
 
         /// <summary>
-        /// Generate grid subjects
+        /// Generate Grid subjects
         /// </summary>
-        /// <param name="grid"> Grid in which subjects are generated </param>
         /// <returns></returns>
-        public Grid GenerateSchedule(Grid grid)
+        public Grid GenerateSchedule()
         {
-            // Generate definition
-            this.GenerateColumnDefinitions(grid);
-            this.GenerateColumnDefinitions(grid, leftHeadSize);
-            this.GenerateRowDefinitions(grid, topHeadSize);
-
             int dayNumber = 0;
             foreach (ScheduleDay scheduleDay in schedule.ScheduleDays)
             {
@@ -125,15 +211,38 @@ namespace BakalariClient.Services
                     UIElement uiElement = this.GenerateCell(scheduleSubject);
                     Grid.SetRow(uiElement, dayNumber + topHeadSize);
                     Grid.SetColumn(uiElement, subjectNumber + leftHeadSize);
-                    grid.Children.Add(uiElement);
+                    Grid.Children.Add(uiElement);
                     subjectNumber++;
                 }
                 dayNumber++;
             }
 
-            return grid;
+            return Grid;
         }
 
-
+        public UIElement GenerateTooltip(ScheduleSubject scheduleSubject)
+        {
+            string tooltipContent = (scheduleSubject.Teacher != "" ?       $"Učitel: {scheduleSubject.Teacher}\n" : "") +
+                                    (scheduleSubject.ClassLocation != "" ? $"Učebna: {scheduleSubject.ClassLocation}\n" : "") +
+                                    (scheduleSubject.Group != "" ?         $"Skupina: {scheduleSubject.Group}\n" : "") +
+                                    (scheduleSubject.LessonSubject != "" ? $"Téma: {scheduleSubject.LessonSubject}\n" : "") +
+                                    (scheduleSubject.ChangeInfo != "" ?    $"Změny: {scheduleSubject.ChangeInfo}\n" : "") +
+                                    (scheduleSubject.Notice != "" ?        $"Upozornění: {scheduleSubject.Notice}\n" : "");
+            TextBlock textBlock = new TextBlock()
+            {
+                Text = tooltipContent.Trim(),
+                Foreground = new SolidColorBrush()
+                {
+                    Color = Color.FromRgb(255, 255, 247),
+                }
+                
+            };
+            Card card = new Card()
+            {
+                Content = textBlock,
+                Padding = new Thickness(3),
+            };
+            return card;
+        }
     }
 }
