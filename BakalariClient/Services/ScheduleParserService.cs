@@ -103,7 +103,7 @@ namespace BakalariClient.Services
                 {
                     DayName = dayLabels[i],
                     ScheduleSubjects = LoadSubjects(day),
-                    Date = DateTime.ParseExact(dateString, "dd/M", CultureInfo.InvariantCulture),
+                    Date = DateTime.ParseExact(dateString, "d/M", CultureInfo.InvariantCulture),
                 });
 
                 i++;

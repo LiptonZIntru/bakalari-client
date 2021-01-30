@@ -44,8 +44,25 @@ namespace BakalariClient.Services
         /// <returns> Login cookies </returns>
         public CookieContainer Authorize(Credential credentials)
         {
-            HttpRequestService httpRequestService = new HttpRequestService();
-            httpRequestService.Send(url, cookieContainer, credentials, false);
+            string response = "";
+            try
+            {
+                HttpRequestService httpRequestService = new HttpRequestService();
+                response = httpRequestService.Send(url, cookieContainer, credentials, false).Substring(48, 30);
+            }
+            catch
+            {
+                new LogService().Add("Wrong URL~");
+                throw new Exception("Wrong URL~");
+            }
+            
+
+            if(response == "Bakalari - login to the system")
+            {
+                new LogService().Add("Wrong credentials!");
+                throw new Exception("Wrong credentials!");
+            }
+
             return cookieContainer;
         }
     }

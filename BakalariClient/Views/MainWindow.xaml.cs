@@ -36,7 +36,7 @@ namespace BakalariClient
             logService = new LogService();
             logService.Add("\n\nProgram started\n");
 
-            try
+            /*try
             {
                 logService.Add("Getting credentials...");
 
@@ -52,7 +52,7 @@ namespace BakalariClient
 
                 CredentialWindow credentialWindow = new CredentialWindow();
                 credentialWindow.ShowDialog();
-            }
+            }*/
 
             try
             {
@@ -70,7 +70,7 @@ namespace BakalariClient
             logService.Add("Reading credentials file...");
 
             // Login user and set cookies
-            CredentialService credentialService = new CredentialService();
+            ConfigService credentialService = new ConfigService();
             config = credentialService.GetCredentials();
 
             logService.Add("Success");
@@ -83,7 +83,12 @@ namespace BakalariClient
             logService.Add("Parsing schedule...");
 
             // Get Schedule (rozvrh)
-            ScheduleService scheduleService = new ScheduleService(cookieContainer, config.ScheduleUrl);
+            string url = config.ScheduleUrl;
+            if ((DateTime.Today.DayOfWeek.ToString() == "Saturday" || DateTime.Today.DayOfWeek.ToString() == "Sunday") && config.DisplayNextWeekFromSaturday == true)
+            {
+                url += "?s=next";
+            }
+            ScheduleService scheduleService = new ScheduleService(cookieContainer, url); ;
             scheduleService.GetHtmlPage();
             Schedule schedule = scheduleService.GetSchedule();
 
