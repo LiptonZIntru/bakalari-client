@@ -3,7 +3,6 @@
 - features:
   - displayed dynamic schedule
   - added tooltip for subjects such as location, teacher, substitution (suplování), etc.
-  - 
   
 - in future:
   - displaying special subject events (with green mark)
