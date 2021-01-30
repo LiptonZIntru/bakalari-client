@@ -29,6 +29,22 @@ namespace BakalariClient.Views
             InitializeComponent();
 
             logService = new LogService();
+            try
+            {
+                logService.Add("Getting credentials...");
+
+                ConfigService credentialService = new ConfigService();
+                credentialService.GetCredentials();
+
+                logService.Add("Success");
+
+                OpenMainWindow();
+            }
+            catch
+            {
+                logService.Add("Failed");
+                logService.Add("Creating credentials file");
+            }
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
@@ -43,11 +59,18 @@ namespace BakalariClient.Views
                 },
             };
 
-            CredentialService credentialService = new CredentialService();
+            ConfigService credentialService = new ConfigService();
             credentialService.SetCredentials(config);
 
             logService.Add("Credentials file created");
 
+            OpenMainWindow();
+        }
+
+        private void OpenMainWindow()
+        {
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.Show();
             this.Close();
         }
     }

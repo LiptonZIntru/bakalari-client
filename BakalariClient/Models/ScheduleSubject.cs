@@ -77,8 +77,8 @@ namespace BakalariClient.Models
 
                 BeginShortened = time[0];
                 EndShortened = time[1];
-                Begin = DateTime.ParseExact($"{date} {time[0]}", "ddd dd/M H\\:mm", CultureInfo.InvariantCulture);
-                End = DateTime.ParseExact($"{date} {time[1]}", "ddd dd/M H\\:mm", CultureInfo.InvariantCulture);
+                Begin = DateTime.ParseExact($"{date} {time[0]}", "ddd d/M H\\:mm", CultureInfo.InvariantCulture);
+                End = DateTime.ParseExact($"{date} {time[1]}", "ddd d/M H\\:mm", CultureInfo.InvariantCulture);
 
                 Name = data[0].Trim();
                 Duration = (endTimeSpan - beginTimeSpan).ToString("hh\\:mm");

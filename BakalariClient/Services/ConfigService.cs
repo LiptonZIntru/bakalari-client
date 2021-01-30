@@ -9,13 +9,12 @@ using Newtonsoft.Json;
 
 namespace BakalariClient.Services
 {
-    class CredentialService
+    class ConfigService
     {
         private readonly string filename;
         private Config config;
-        public CredentialService(string filename = "config.json")
+        public ConfigService(string filename = "config.json")
         {
-            //filename = @"..\..\" + filename;
             this.filename = filename;
         }
 
@@ -35,6 +34,10 @@ namespace BakalariClient.Services
 
         public Config SetCredentials(Config config)
         {
+            if (config.DisplayNextWeekFromSaturday == null)
+            {
+                config.DisplayNextWeekFromSaturday = true;
+            }
             string configText = JsonConvert.SerializeObject(config);
             File.WriteAllText(this.filename, configText);
             return config;
