@@ -28,7 +28,7 @@
             <Setter Property="ToolTipService.ShowDuration" Value="60000" />
         </Style>
     </Window.Resources>
-    <Grid>
+    <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>

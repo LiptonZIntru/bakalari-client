@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using BakalariClient.Models;
 using BakalariClient.Services;
 using BakalariClient.Views;
@@ -30,6 +31,7 @@ namespace BakalariClient
         private CookieContainer cookieContainer;
         private Config config;
         private LogService logService;
+        private DispatcherTimer dispatcherTimer;
         public MainWindow()
         {
             InitializeComponent();
@@ -62,8 +64,24 @@ namespace BakalariClient
             {
                 logService.Add("Schedule loading failed");
             }
+
+            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
+            dispatcherTimer.Start();
         }
-        
+
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            //LoadSchedule();
+            ScheduleContentGrid = new Grid()
+            {
+                Margin = new Thickness(10, 20, 10, 10)
+            };
+            Grid.SetColumn(ScheduleContentGrid, 1);
+            MainGrid.Children.Add(ScheduleContentGrid);
+        }
+
 
         private void LoadSchedule()
         {
