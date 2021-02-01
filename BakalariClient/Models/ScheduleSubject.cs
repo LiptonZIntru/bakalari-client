@@ -11,10 +11,10 @@ namespace BakalariClient.Models
     class ScheduleSubject
     {
 
-        [JsonIgnore]
+        [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty(PropertyName = "shortname")]
         public string ShortName { get; set; }
 
         [JsonProperty(PropertyName = "teacher")]
@@ -41,47 +41,50 @@ namespace BakalariClient.Models
         [JsonProperty(PropertyName = "identcode")]
         public string Id { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty(PropertyName = "begin")]
         public DateTime Begin { get; private set; }
 
-        [JsonIgnore]
+        [JsonProperty(PropertyName = "end")]
         public DateTime End { get; private set; }
 
-        [JsonIgnore]
+        [JsonProperty(PropertyName = "begin_shortened")]
         public string BeginShortened { get; private set; }
 
-        [JsonIgnore]
+        [JsonProperty(PropertyName = "end_shortened")]
         public string EndShortened { get; private set; }
 
-        [JsonIgnore]
+        [JsonProperty(PropertyName = "duration")]
         public string Duration { get; private set; }
 
 
-        [JsonProperty(PropertyName = "subjecttext", Required = Required.Always)]
+        [JsonProperty(PropertyName = "subjecttext")]
         public string AdditionalInformation
         {
             set
             {
-                string[] data = value.Split('|');
+                if (value != null)
+                {
+                    string[] data = value.Split('|');
 
-                string date = data[1].Trim();
-                string[] time = new string[2];
-                time = data[2]
-                    .Split('(')[1]
-                    .Split(')')[0]
-                    .Replace(" ", "")
-                    .Split('-');
+                    string date = data[1].Trim();
+                    string[] time = new string[2];
+                    time = data[2]
+                        .Split('(')[1]
+                        .Split(')')[0]
+                        .Replace(" ", "")
+                        .Split('-');
 
-                TimeSpan beginTimeSpan = TimeSpan.ParseExact(time[0], "h\\:mm", CultureInfo.InvariantCulture);
-                TimeSpan endTimeSpan = TimeSpan.ParseExact(time[1], "h\\:mm", CultureInfo.InvariantCulture);
+                    TimeSpan beginTimeSpan = TimeSpan.ParseExact(time[0], "h\\:mm", CultureInfo.InvariantCulture);
+                    TimeSpan endTimeSpan = TimeSpan.ParseExact(time[1], "h\\:mm", CultureInfo.InvariantCulture);
 
-                BeginShortened = time[0];
-                EndShortened = time[1];
-                Begin = DateTime.ParseExact($"{date} {time[0]}", "ddd d/M H\\:mm", CultureInfo.InvariantCulture);
-                End = DateTime.ParseExact($"{date} {time[1]}", "ddd d/M H\\:mm", CultureInfo.InvariantCulture);
+                    BeginShortened = time[0];
+                    EndShortened = time[1];
+                    Begin = DateTime.ParseExact($"{date} {time[0]}", "ddd d/M H\\:mm", CultureInfo.InvariantCulture);
+                    End = DateTime.ParseExact($"{date} {time[1]}", "ddd d/M H\\:mm", CultureInfo.InvariantCulture);
 
-                Name = data[0].Trim();
-                Duration = (endTimeSpan - beginTimeSpan).ToString("hh\\:mm");
+                    Name = data[0].Trim();
+                    Duration = (endTimeSpan - beginTimeSpan).ToString("hh\\:mm");
+                }
             }
         }
     }

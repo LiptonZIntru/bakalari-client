@@ -32,29 +32,12 @@ namespace BakalariClient
         private Config config;
         private LogService logService;
         private DispatcherTimer dispatcherTimer;
+        private Schedule schedule;
         public MainWindow()
         {
             InitializeComponent();
             logService = new LogService();
             logService.Add("\n\nProgram started\n");
-
-            /*try
-            {
-                logService.Add("Getting credentials...");
-
-                CredentialService credentialService = new CredentialService();
-                config = credentialService.GetCredentials();
-
-                logService.Add("Success");
-            }
-            catch (Exception e)
-            {
-                logService.Add("Failed");
-                logService.Add("Creating credentials file");
-
-                CredentialWindow credentialWindow = new CredentialWindow();
-                credentialWindow.ShowDialog();
-            }*/
 
             try
             {
@@ -64,26 +47,18 @@ namespace BakalariClient
             {
                 logService.Add("Schedule loading failed");
             }
-
-            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
+            dispatcherTimer.Interval = new TimeSpan(0, 5, 0);
             dispatcherTimer.Start();
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            //LoadSchedule();
-            ScheduleContentGrid = new Grid()
-            {
-                Margin = new Thickness(10, 20, 10, 10)
-            };
-            Grid.SetColumn(ScheduleContentGrid, 1);
-            MainGrid.Children.Add(ScheduleContentGrid);
+            LoadSchedule();
         }
 
-
-        private void LoadSchedule()
+        private void LoadScheduleFromServer()
         {
             logService.Add("Reading credentials file...");
 
@@ -106,9 +81,11 @@ namespace BakalariClient
             {
                 url += "?s=next";
             }
-            ScheduleService scheduleService = new ScheduleService(cookieContainer, url); ;
+            ScheduleService scheduleService = new ScheduleService(cookieContainer, url);
+
             scheduleService.GetHtmlPage();
-            Schedule schedule = scheduleService.GetSchedule();
+            schedule = scheduleService.GetSchedule();
+
 
             logService.Add("Success");
             logService.Add("Generating schedule...");
@@ -117,6 +94,49 @@ namespace BakalariClient
             scheduleGenerator.GenerateSchedule();
 
             logService.Add("Success");
+        }
+
+        private void LoadSchedule()
+        {
+            if (ScheduleContentGrid.Children.Count != 0)
+            {
+                ScheduleContentGrid.Children.RemoveRange(0, ScheduleContentGrid.Children.Count);
+            }
+            if (ScheduleContentGrid.ColumnDefinitions.Count != 0)
+            {
+                ScheduleContentGrid.ColumnDefinitions.RemoveRange(0, ScheduleContentGrid.ColumnDefinitions.Count);
+            }
+            if (ScheduleContentGrid.RowDefinitions.Count != 0)
+            {
+                ScheduleContentGrid.RowDefinitions.RemoveRange(0, ScheduleContentGrid.RowDefinitions.Count);
+            }
+
+            try
+            {
+                LoadScheduleFromServer();
+            }
+            catch
+            {
+                LoadScheduleFromFile();
+            }
+        }
+
+        private void LoadScheduleFromFile()
+        {
+            try
+            {
+                logService.Add("Loading schedule from file...");
+
+                ScheduleService scheduleService = new ScheduleService();
+                schedule = scheduleService.LoadScheduleFromFile();
+
+                ScheduleGeneratorService scheduleGenerator = new ScheduleGeneratorService(schedule, ScheduleContentGrid);
+                scheduleGenerator.GenerateSchedule();
+            }
+            catch
+            {
+                logService.Add("Schedule loading from file failed");
+            }
         }
     }
 }

@@ -52,8 +52,8 @@ namespace BakalariClient.Services
             }
             catch
             {
-                new LogService().Add("Wrong URL~");
-                throw new Exception("Wrong URL~");
+                new LogService().Add("Wrong URL");
+                throw new Exception("Wrong URL");
             }
             
 
